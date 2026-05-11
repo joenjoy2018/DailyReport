@@ -167,16 +167,19 @@ def load_asset_info(symbol: str):
     ticker = yf.Ticker(symbol)
     
     try:
-        # 최신 가격 및 변동 정보 추출
-        hist = ticker.history(period="2d")
-        if len(hist) >= 2:
+        # Cloud 환경의 IP 블로킹을 피하기 위해 .info 대신 .history(period="5d") 사용
+        hist = ticker.history(period="5d")
+        if not hist.empty:
             current_price = hist['Close'].iloc[-1]
-            previous_close = hist['Close'].iloc[-2]
+            # 데이터가 부족할 경우 현재가를 이전 종가로 대체하여 에러 방지
+            previous_close = hist['Close'].iloc[-2] if len(hist) >= 2 else current_price
             volume = hist['Volume'].iloc[-1]
         else:
-            current_price = ticker.info.get("regularMarketPrice") or ticker.info.get("currentPrice")
-            previous_close = ticker.info.get("regularMarketPreviousClose")
-            volume = ticker.info.get("regularMarketVolume")
+            # history가 비어있는 경우 최후의 수단으로 info 시도
+            info = ticker.info
+            current_price = info.get("regularMarketPrice") or info.get("currentPrice")
+            previous_close = info.get("regularMarketPreviousClose")
+            volume = info.get("regularMarketVolume")
     except Exception:
         current_price = None
         previous_close = None
