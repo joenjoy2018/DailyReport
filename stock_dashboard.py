@@ -299,13 +299,22 @@ def get_tone(pct):
     if pct is None: return "데이터 없음"
     return "상승세" if pct > 0.2 else ("하락세" if pct < -0.2 else "보합세")
 
+# 안전한 포맷팅을 위한 헬퍼 함수
+def safe_pct(pct):
+    return f"{pct:+.2f}%" if pct is not None else "데이터 미수신"
+
+ndx_pct_str = safe_pct(ndx_pct)
+btc_pct_str = safe_pct(btc_pct)
+gold_pct_str = safe_pct(gold_pct)
+krw_pct_str = safe_pct(krw_pct)
+
 # 문맥에 맞게 단락 통합 및 텍스트 구성
 report_header = f"{query_date} 글로벌 금융 시장 현황입니다."
 report_body1 = f"{macro_desc}현재 {vix_desc} 있으며, {tnx_desc}."
-report_body2 = f"종합적으로 볼 때 {news_desc}. 특히 나스닥 지수가 {ndx_pct:+.2f}%의 변동을 보이며 시장의 방향성을 주도하는 가운데, {sector_report_msg}"
-report_body3 = f"관심 자산별 세부 동향을 살펴보면, 나스닥100 지수는 현재 **{get_tone(ndx_pct)}**({ndx_pct:+.2f}%)를 기록하며 시장의 기술주 중심 흐름을 반영하고 있습니다. " \
-               f"가상자산 시장에서 비트코인은 {btc_pct:+.2f}% 변동하며 투자자들의 위험 선호 심리를 대변하고 있으며, " \
-               f"안전 자산인 금({gold_pct:+.2f}%)과 달러/원 환율({krw_pct:+.2f}%)의 움직임은 글로벌 불확실성과 국내 수급 환경의 변화를 고스란히 보여주고 있습니다."
+report_body2 = f"종합적으로 볼 때 {news_desc}. 특히 나스닥 지수가 {ndx_pct_str}의 변동을 보이며 시장의 방향성을 주도하는 가운데, {sector_report_msg}"
+report_body3 = f"관심 자산별 세부 동향을 살펴보면, 나스닥100 지수는 현재 **{get_tone(ndx_pct)}**({ndx_pct_str})를 기록하며 시장의 기술주 중심 흐름을 반영하고 있습니다. " \
+               f"가상자산 시장에서 비트코인은 {btc_pct_str} 변동하며 투자자들의 위험 선호 심리를 대변하고 있으며, " \
+               f"안전 자산인 금({gold_pct_str})과 달러/원 환율({krw_pct_str})의 움직임은 글로벌 불확실성과 국내 수급 환경의 변화를 고스란히 보여주고 있습니다."
 
 # 글씨 크기를 조절하여(#####) 상단에 표시
 st.markdown(f"<h2 style='color: #191f28;'>{report_header}</h2>", unsafe_allow_html=True)
